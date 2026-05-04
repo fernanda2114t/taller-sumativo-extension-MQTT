@@ -6,10 +6,10 @@ import ssl
 
 AWS_ENDPOINT = "a2apsmaa0mdv52-ats.iot.us-east-1.amazonaws.com"
 AWS_PORT = 8883
-TOPIC = "campo/cebolla/humedad"
-CLIENT_ID = "cebolla_humedad"
+TOPIC = "mina/zona_perforacion/seguridad"
+CLIENT_ID = "sensor_vibraciones"
 
-CERTS_PATH = "C:/Users/pixel/Desktop/cebolla"
+CERTS_PATH = "/app/certs"
 CA_CERT   = f"{CERTS_PATH}/AmazonRootCA1 (2).pem"
 CERT_FILE = f"{CERTS_PATH}/0f5f9f5a67b470a0c1d7dfd00e79c39bca1c7d5dabffb6958d1db1a7377b3387-certificate.pem.crt"
 KEY_FILE  = f"{CERTS_PATH}/0f5f9f5a67b470a0c1d7dfd00e79c39bca1c7d5dabffb6958d1db1a7377b3387-private.pem.key"
@@ -29,12 +29,12 @@ client.loop_start()
 
 try:
     while True:
-        valor = round(random.uniform(30.0, 90.0), 2)
-        mensaje = json.dumps({"sensor": "humedad", "valor": valor, "grupo": "cebolla"})
+        valor = round(random.uniform(1.0, 10.0), 2)
+        mensaje = json.dumps({"sensor": "vibraciones", "valor": valor, "grupo": "zona_perforacion", "publish_time": time.time()})
         client.publish(TOPIC, mensaje)
         print(f"Publicado: {mensaje}", flush=True)
         time.sleep(3)
-except KeyboardInterrupt:
-    print("Detenido.")
+except Exception as e:
+    print(f"Error inesperado: {e}", flush=True)
     client.loop_stop()
     client.disconnect()

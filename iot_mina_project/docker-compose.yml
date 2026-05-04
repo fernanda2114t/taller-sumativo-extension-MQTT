@@ -1,0 +1,124 @@
+services:
+
+  mongodb:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
+  subscriber:
+    build: ./mqtt_client
+    volumes:
+      - C:/Users/pixel/Desktop/cebolla:/app/certs:ro
+    depends_on:
+      - mongodb
+    restart: on-failure
+
+  # Sensores de seguridad
+  sensor_temperatura:
+    build: ../aws_sensors
+    command: python seguridad/sensor_temperatura.py
+    volumes:
+      - C:/Users/pixel/Desktop/cebolla:/app/certs:ro
+    restart: on-failure
+
+  sensor_humedad:
+    build: ../aws_sensors
+    command: python seguridad/sensor_humedad.py
+    volumes:
+      - C:/Users/pixel/Desktop/cebolla:/app/certs:ro
+    restart: on-failure
+
+  sensor_vibraciones:
+    build: ../aws_sensors
+    command: python seguridad/sensor_vibraciones.py
+    volumes:
+      - C:/Users/pixel/Desktop/cebolla:/app/certs:ro
+    restart: on-failure
+
+  # Sensores quimicos
+  sensor_co2:
+    build: ../aws_sensors
+    command: python quimica/sensor_CO2.py
+    volumes:
+      - C:/Users/pixel/Desktop/cebolla:/app/certs:ro
+    restart: on-failure
+
+  sensor_so2:
+    build: ../aws_sensors
+    command: python quimica/sensor_SO2.py
+    volumes:
+      - C:/Users/pixel/Desktop/cebolla:/app/certs:ro
+    restart: on-failure
+
+  sensor_particulado:
+    build: ../aws_sensors
+    command: python quimica/sensor_particulado.py
+    volumes:
+      - C:/Users/pixel/Desktop/cebolla:/app/certs:ro
+    restart: on-failure
+
+  # Sensores de produccion
+  sensor_toneladas:
+    build: ../aws_sensors
+    command: python produccion/sensor_toneladas.py
+    volumes:
+      - C:/Users/pixel/Desktop/cebolla:/app/certs:ro
+    restart: on-failure
+
+  sensor_ciclos:
+    build: ../aws_sensors
+    command: python produccion/sensor_ciclos.py
+    volumes:
+      - C:/Users/pixel/Desktop/cebolla:/app/certs:ro
+    restart: on-failure
+
+  rest_api:
+    build: ./rest_api
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    restart: on-failure
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8501:8501"
+    depends_on:
+      - rest_api
+    restart: on-failure
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    depends_on:
+      - rest_api
+    restart: on-failure
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: on-failure
+
+volumes:
+  mongo_data:
+  prometheus_data:
+  grafana_data:

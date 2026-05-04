@@ -1,0 +1,68 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "title": "Monitoreo Zona de Perforacion - Mina IoT",
+  "uid": "mina-perforacion-001",
+  "timezone": "browser",
+  "refresh": "15s",
+  "schemaVersion": 36,
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Latencia de transmision (publicacion -> recepcion subscriber)",
+      "description": "Tiempo promedio en ms entre que el sensor publica en AWS IoT Core y el subscriber recibe el mensaje",
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "mina_latencia_ms",
+          "legendFormat": "Latencia (ms)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": { "mode": "palette-classic" },
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 500 },
+              { "color": "red", "value": 1000 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Frecuencia de publicacion / ingesta",
+      "description": "Cantidad de mensajes recibidos por el subscriber en el ultimo minuto",
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "mina_frecuencia_por_min",
+          "legendFormat": "Mensajes/minuto",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "palette-classic" }
+        }
+      }
+    }
+  ],
+  "time": { "from": "now-30m", "to": "now" }
+}

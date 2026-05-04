@@ -6,10 +6,10 @@ import ssl
 
 AWS_ENDPOINT = "a2apsmaa0mdv52-ats.iot.us-east-1.amazonaws.com"
 AWS_PORT = 8883
-TOPIC = "campo/cebolla/aire"
-CLIENT_ID = "cebolla_aire"
+TOPIC = "mina/zona_perforacion/quimica"
+CLIENT_ID = "sensor_SO2"
 
-CERTS_PATH = "C:/Users/pixel/Desktop/cebolla"
+CERTS_PATH = "/app/certs"
 CA_CERT   = f"{CERTS_PATH}/AmazonRootCA1 (2).pem"
 CERT_FILE = f"{CERTS_PATH}/0f5f9f5a67b470a0c1d7dfd00e79c39bca1c7d5dabffb6958d1db1a7377b3387-certificate.pem.crt"
 KEY_FILE  = f"{CERTS_PATH}/0f5f9f5a67b470a0c1d7dfd00e79c39bca1c7d5dabffb6958d1db1a7377b3387-private.pem.key"
@@ -29,8 +29,8 @@ client.loop_start()
 
 try:
     while True:
-        valor = round(random.uniform(300.0, 1200.0), 2)
-        mensaje = json.dumps({"sensor": "aire", "valor": valor, "grupo": "cebolla"})
+        valor = round(random.uniform(0.5, 15.0), 2)
+        mensaje = json.dumps({"sensor": "SO2", "valor": valor, "grupo": "zona_perforacion", "publish_time": time.time()})
         client.publish(TOPIC, mensaje)
         print(f"Publicado: {mensaje}", flush=True)
         time.sleep(3)

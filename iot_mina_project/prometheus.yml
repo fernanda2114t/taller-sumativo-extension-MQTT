@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'mina_perforacion'
+    static_configs:
+      - targets: ['rest_api:5000']

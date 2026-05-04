@@ -6,10 +6,10 @@ import ssl
 
 AWS_ENDPOINT = "a2apsmaa0mdv52-ats.iot.us-east-1.amazonaws.com"
 AWS_PORT = 8883
-TOPIC = "campo/cebolla/ph"
-CLIENT_ID = "cebolla_ph"
+TOPIC = "mina/zona_perforacion/produccion"
+CLIENT_ID = "sensor_ciclos"
 
-CERTS_PATH = "C:/Users/pixel/Desktop/cebolla"
+CERTS_PATH = "/app/certs"
 CA_CERT   = f"{CERTS_PATH}/AmazonRootCA1 (2).pem"
 CERT_FILE = f"{CERTS_PATH}/0f5f9f5a67b470a0c1d7dfd00e79c39bca1c7d5dabffb6958d1db1a7377b3387-certificate.pem.crt"
 KEY_FILE  = f"{CERTS_PATH}/0f5f9f5a67b470a0c1d7dfd00e79c39bca1c7d5dabffb6958d1db1a7377b3387-private.pem.key"
@@ -19,7 +19,6 @@ def on_connect(client, userdata, flags, rc):
         print(f"Conectado a AWS IoT Core | Topic: {TOPIC}", flush=True)
     else:
         print(f"Error de conexion: {rc}")
-
 client = mqtt.Client(client_id=CLIENT_ID)
 client.on_connect = on_connect
 client.tls_set(ca_certs=CA_CERT, certfile=CERT_FILE, keyfile=KEY_FILE,
@@ -29,12 +28,12 @@ client.loop_start()
 
 try:
     while True:
-        valor = round(random.uniform(5.5, 8.0), 2)
-        mensaje = json.dumps({"sensor": "ph", "valor": valor, "grupo": "cebolla"})
+        valor = random.randint(1, 15)
+        mensaje = json.dumps({"sensor": "ciclos", "valor": valor, "grupo": "zona_perforacion", "publish_time": time.time()})
         client.publish(TOPIC, mensaje)
         print(f"Publicado: {mensaje}", flush=True)
         time.sleep(3)
 except KeyboardInterrupt:
     print("Detenido.")
     client.loop_stop()
-    client.disconnect()
+    client.disconnect()        
